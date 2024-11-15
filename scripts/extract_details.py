@@ -82,10 +82,12 @@ workflow = StateGraph(AgentState)
 retrieve = ToolNode([retriever_tool])
 
 workflow.add_node("agent", agent)
+workflow.add_node("retrieve", retrieve)
 workflow.add_node("generate", generate)
 
 workflow.add_edge(START, "agent")
-workflow.add_edge("agent", "generate")
+workflow.add_edge("agent", "retrieve")
+workflow.add_edge("retrieve", "generate")
 workflow.add_edge("generate", END)
 
 graph = workflow.compile()
