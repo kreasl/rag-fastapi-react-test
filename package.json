@@ -1,5 +1,5 @@
 {
-  "name": "nextjs-fastapi",
+  "name": "rag-fastapi-react-test",
   "version": "0.2.0",
   "private": true,
   "scripts": {
@@ -11,6 +11,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.60.2",
     "@types/node": "22.5.5",
     "@types/react": "18.3.8",
     "@types/react-dom": "18.3.0",
@@ -18,6 +19,7 @@
     "concurrently": "^9.0.1",
     "eslint": "8.41.0",
     "eslint-config-next": "13.4.4",
+    "lucide-react": "^0.456.0",
     "next": "^14.2.13",
     "postcss": "^8.4.47",
     "react": "18.3.1",
