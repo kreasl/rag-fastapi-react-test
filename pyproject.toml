@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "rag-fastapi-react-test"
+version = "0.1.0"
+description = ""
+authors = ["Yury Talapila <yury.talapila@gmail.com>"]
+readme = "README.md"
+packages = [{include = "api"}, {include = "ai"}, {include = "scripts"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "0.115.0"
+uvicorn = {version = "0.30.6", extras = ["standard"]}
+pyopenssl = "^24.2.1"
+urllib3 = "<2.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
