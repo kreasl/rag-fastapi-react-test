@@ -7,9 +7,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import FileResponse
 from sqlalchemy.orm import Session
 
-from . import crud, models, schemas
-from .database import SessionLocal, engine, get_db
-from .models import Application
+from .db import crud, models
+from api.db.database import SessionLocal, engine, get_db
+from api.db.models import Application
 
 models.Application.metadata.create_all(bind=engine)
 

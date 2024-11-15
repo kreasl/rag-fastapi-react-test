@@ -94,13 +94,7 @@ inputs = {
     "messages": [
         (
             "user",
-            """
-                Provide a list of Frontend tools which applicant has experience with?
-                EXAMPLE INPUT: I've worked with React, Angular, HTML and CSS. Also PHP and Java
-                EXAMPLE OUTPUT: React, Angular, HTML, CSS
-                EXAMPLE INPUT: Vue, Prisma, React Hooks, React-query
-                EXAMPLE OUTPUT: Vue, React Hooks, React-query
-            """
+            "What is Applicant's name?"
         )
     ]
 }

@@ -1,7 +1,8 @@
 from datetime import datetime
 
 from sqlalchemy.orm import Session
-from . import models, schemas
+from api.db import schemas, models
+
 
 def get_application(db: Session, id: int):
     return db.query(models.Application).filter(models.Application.id == id).first()
