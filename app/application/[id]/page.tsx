@@ -21,7 +21,7 @@ export default function EntityDetailsPage({ params }: { params: { id: string } }
     const { data, isLoading, isError } = useQuery<EntityDetails>({
         queryKey: ['entity', params.id],
         queryFn: async () => {
-            const res = await fetch(`${API_ROOT_URL}/api/cv/${params.id}`);
+            const res = await fetch(`${API_ROOT_URL}/api/application/${params.id}`);
             if (!res.ok) throw new Error('Failed to fetch entity');
             return res.json();
         },
@@ -65,7 +65,7 @@ export default function EntityDetailsPage({ params }: { params: { id: string } }
                 </div>
             </div>
             <Link
-                href={`/cv/${data.id}/edit`}
+                href={`/application/${data.id}/edit`}
                 className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 relative"
             >
                 Edit

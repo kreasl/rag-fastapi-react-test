@@ -4,31 +4,27 @@ import { useQuery } from '@tanstack/react-query';
 import Link from "next/link";
 import { Download } from 'lucide-react';
 
-interface CV {
+interface Application {
     id: string;
     name: string;
     description: string;
     path: string;
 }
 
-interface FetchInterface {
-    cvs: CV[];
-}
-
 const API_ROOT_URL = 'http://localhost:8000';
-const CV_LIST_URL = `${API_ROOT_URL}/api/cv`;
+const APPLICATIONS_URL = `${API_ROOT_URL}/api/applications`;
 
-const fetchEntities = async (): Promise<FetchInterface> => {
-    const response = await fetch(CV_LIST_URL);
+const fetchEntities = async (): Promise<Application[]> => {
+    const response = await fetch(APPLICATIONS_URL);
     if (!response.ok) {
         throw new Error('Failed to fetch entities');
     }
     return response.json();
 };
 
-const EntityList = () => {
+export default function Applications() {
     const {data, isLoading, isError, error} = useQuery({
-        queryKey: ['cvs'],
+        queryKey: ['applications'],
         queryFn: fetchEntities,
     });
 
@@ -50,17 +46,17 @@ const EntityList = () => {
 
     return (
         <div className="grid gap-4">
-            {data?.cvs.map((cv, index) => (
+            {data?.map((application, index) => (
                 <div
                     key={index}
                     className="relative border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                 >
-                    <Link href={`/cv/${cv.id}`} className="block">
-                        <h3 className="font-semibold text-lg">{cv.name}</h3>
+                    <Link href={`/application/${application.id}`} className="block">
+                        <h3 className="font-semibold text-lg">{application.name}</h3>
                     </Link>
-                    {cv.path && (
+                    {application.path && (
                         <a
-                            href={`http://localhost:8000/${cv.path}`}
+                            href={`http://localhost:8000/${application.path}`}
                             download
                             className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full"
                             title="Download CV"
@@ -72,7 +68,7 @@ const EntityList = () => {
             ))}
             <div>
                 <Link
-                    href="/cv/new"
+                    href="/application/new"
                     className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
                 >
                     Add New
@@ -81,5 +77,3 @@ const EntityList = () => {
         </div>
     );
 };
-
-export default EntityList;

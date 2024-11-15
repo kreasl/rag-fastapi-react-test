@@ -2,11 +2,16 @@ import os.path
 import uuid
 from http.client import HTTPException
 
-from fastapi import FastAPI, UploadFile
+from fastapi import Depends, FastAPI, Form, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import FileResponse
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import Session
+
+from . import crud, models, schemas
+from .database import SessionLocal, engine, get_db
+from .models import Application
+
+models.Application.metadata.create_all(bind=engine)
 
 ### Create FastAPI instance with custom docs and openapi url
 
@@ -21,45 +26,48 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
+@app.get("/api/applications")
+def get_applications(db: Session = Depends(get_db)):
+    applications = crud.get_applications(db)
+    return applications
 
-engine = create_engine(f"sqlite:///{ROOT_PATH}/db/db.sqlite", echo=True)
+@app.get("/api/application/{application_id}")
+def get_application(application_id: int, db: Session = Depends(get_db)):
+    application = crud.get_application(db, application_id)
+    return application
 
-@app.get("/api/py/helloFastApi")
-def hello_fast_api():
-    return {"message": "Hello from FastAPI"}
-
-@app.get("/api/cv")
-def get_all_cvs():
-    return {
-        "cvs": [
-            {"id":"1", "name": "First CV", "path": "api/cv/download/0d9c50ac-5c51-4b18-9524-59382ce2ce18.pdf"},
-            {"id":"2", "name": "Second CV", "path": "api/cv/download/2"},
-            {"id":"3", "name": "Third CV", "path": "api/cv/download/3"},
-            {"id":"4", "name": "Fourth CV", "path": "api/cv/download/4"},
-        ],
-    }
-
-@app.get("/api/cv/{id}")
-def get_cv(id: str):
-    return {
-        "id": "1",
-        "name": "First CV",
-        "description": "This is the first CV",
-        "path": "/api/cv/download/4",
-    }
-
-@app.post("/api/cv")
-async def post_cv(name: str, description: str, file: UploadFile):
+@app.post("/api/application")
+async def create_application(name: str = Form(...), description: str = Form(...), file: UploadFile = None):
     path = f"{uuid.uuid4()}.pdf"
 
     upload_file_path = f"{UPLOAD_PATH}/{path}"
-    with open(upload_file_path, "wb") as out_file:
-        while content := await file.read():
-            out_file.write(content)
 
-    return {"message": "CV created", "path": upload_file_path}
+    try:
+        with open(upload_file_path, "wb") as out_file:
+            while content := await file.read():
+                out_file.write(content)
 
-@app.get("/api/cv/download/{path}")
+        db = SessionLocal()
+        application = Application(
+            name=name,
+            description=description,
+            path=path
+        )
+
+        db.add(application)
+        db.commit()
+        db.refresh(application)
+
+        return {"message": "Application created", "application": application}
+    except Exception as e:
+        if os.path_exists(upload_file_path):
+            os.remove(upload_file_path)
+
+        raise HTTPException(500, str(e))
+    finally:
+        db.close()
+
+@app.get("/api/cv/{path}")
 async def download_cv(path: str):
     file_location = os.path.join(UPLOAD_PATH, path)
 

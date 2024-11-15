@@ -1,6 +1,6 @@
 'use client';
 
-import CvForm from '@/app/components/CvForm';
+import ApplicationForm from '@/app/components/ApplicationForm';
 import { useQuery } from '@tanstack/react-query';
 
 const API_ROOT_URL = 'http://localhost:8000';
@@ -9,7 +9,7 @@ export default function EditEntityPage({ params }: { params: { id: string } }) {
     const { data, isLoading, isError } = useQuery({
         queryKey: ['entity', params.id],
         queryFn: async () => {
-            const res = await fetch(`${API_ROOT_URL}/api/cv/${params.id}`);
+            const res = await fetch(`${API_ROOT_URL}/api/application/${params.id}`);
             if (!res.ok) throw new Error('Failed to fetch entity');
             return res.json();
         },
@@ -36,5 +36,5 @@ export default function EditEntityPage({ params }: { params: { id: string } }) {
         );
     }
 
-    return <CvForm initialData={data} />;
+    return <ApplicationForm initialData={data} />;
 }

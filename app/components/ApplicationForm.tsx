@@ -18,15 +18,19 @@ interface EntityFormProps {
 
 const API_ROOT_URL = 'http://localhost:8000';
 
-export default function CvForm({ initialData }: EntityFormProps) {
+export default function ApplicationForm({ initialData }: EntityFormProps) {
     const router = useRouter();
     const isEditing = !!initialData?.id;
 
     const mutation = useMutation({
-        mutationFn: async (formData: FormData) => {
+        mutationFn: async (e: FormEvent<HTMLFormElement>) => {
+            e.preventDefault();
+
+            const formData = new FormData(e.target as HTMLFormElement);
+
             const url = isEditing
-                ? `/api/entities/${initialData.id}`
-                : '/api/entities';
+                ? `${API_ROOT_URL}/api/application/${initialData.id}`
+                : `${API_ROOT_URL}/api/application`;
 
             const response = await fetch(url, {
                 method: isEditing ? 'PUT' : 'POST',
@@ -37,15 +41,9 @@ export default function CvForm({ initialData }: EntityFormProps) {
             return response.json();
         },
         onSuccess: () => {
-            router.push('/entities');
+            router.push('/');
         },
     });
-
-    const onSubmit = (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        const formData = new FormData(e.currentTarget);
-        mutation.mutate(formData);
-    };
 
     return (
         <div className="max-w-2xl mx-auto p-6">
@@ -64,7 +62,7 @@ export default function CvForm({ initialData }: EntityFormProps) {
                     {isEditing ? 'Edit Applicant' : 'Create New Applicant'}
                 </h1>
 
-                <form onSubmit={onSubmit} className="space-y-6">
+                <form onSubmit={mutation.mutate} className="space-y-6">
                     <div>
                         <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
                             Name
