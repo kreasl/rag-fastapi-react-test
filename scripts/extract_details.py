@@ -1,4 +1,5 @@
 import json
+from pypdf import PdfReader
 import operator
 import os
 from typing import Annotated, List, TypedDict
@@ -27,19 +28,13 @@ ROOT_PATH = os.path.dirname(os.path.dirname(__file__))
 llm = ChatOpenAI(temperature=0, streaming=True, model_name="gpt-3.5-turbo")
 embeddings = OpenAIEmbeddings()
 
-def load_pdf(pdf_path: str):
-    loader = PyPDFLoader(pdf_path)
-    documents = loader.load()
+def load_pdf(path: str):
+    reader = PdfReader(path)
+    text = ""
+    for page in reader.pages:
+        text += page.extract_text() + "\n\n"
 
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=200
-    )
-    splits = text_splitter.split_documents(documents)
-
-    vectorstore = Chroma.from_documents(documents=splits, embedding=embeddings)
-
-    return vectorstore
+    return text
 
 def answer_questions(state: CvState):
     return [Send("question", {"question": question, "context": state["context"]}) for question in state["questions"]]
@@ -72,9 +67,7 @@ def create_rag_graph():
     return workflow.compile()
 
 def analyze_cv(pdf_path: str, questions: List[str]):
-    vectorstore = load_pdf(pdf_path)
-
-    context = " ".join([doc.page_content for doc in vectorstore.similarity_search("")])
+    context = load_pdf(pdf_path)
 
     state = CvState(
         context=context,
